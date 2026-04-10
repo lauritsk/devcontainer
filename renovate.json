@@ -1,0 +1,78 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update pinned apt package versions in Dockerfile",
+      "managerFilePatterns": [
+        "/(^|/)Dockerfile$/"
+      ],
+      "matchStrings": [
+        "(?:^|\\n)\\s*(?<depName>passwd|sudo|fish|mise|tailscale)=(?<currentValue>[^\\s\\\\]+)"
+      ],
+      "datasourceTemplate": "deb",
+      "versioningTemplate": "deb"
+    }
+  ],
+  "automerge": true,
+  "automergeType": "pr",
+  "platformAutomerge": true,
+  "minimumReleaseAge": "7 days",
+  "internalChecksFilter": "strict",
+  "prCreation": "not-pending",
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "deb"
+      ],
+      "matchPackageNames": [
+        "passwd",
+        "sudo"
+      ],
+      "registryUrls": [
+        "https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64"
+      ]
+    },
+    {
+      "matchDatasources": [
+        "deb"
+      ],
+      "matchPackageNames": [
+        "fish"
+      ],
+      "registryUrls": [
+        "https://download.opensuse.org/repositories/shells:/fish:/release:/4/Debian_13?suite=/&components=&binaryArch=arm64"
+      ]
+    },
+    {
+      "matchDatasources": [
+        "deb"
+      ],
+      "matchPackageNames": [
+        "mise"
+      ],
+      "registryUrls": [
+        "https://mise.jdx.dev/deb?suite=stable&components=main&binaryArch=arm64"
+      ]
+    },
+    {
+      "matchDatasources": [
+        "deb"
+      ],
+      "matchPackageNames": [
+        "tailscale"
+      ],
+      "registryUrls": [
+        "https://pkgs.tailscale.com/stable/debian?suite=trixie&components=main&binaryArch=arm64"
+      ]
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "automerge": true,
+    "platformAutomerge": true
+  }
+}
