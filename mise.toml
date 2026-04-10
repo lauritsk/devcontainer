@@ -1,0 +1,34 @@
+[hooks]
+enter = { task = "setup" }
+
+[tasks.setup]
+description = "Pull container images"
+run = ""
+
+[tasks.commit]
+tools.cocogitto = "7.0.0"
+description = "Create a conventional commit"
+run = "cog commit"
+
+[tasks.build]
+description = "Build devcontainer image"
+run = "docker build -t localhost/devcontainer -f ./Dockerfile ."
+
+[tasks.secrets]
+tools.gitleaks = "8.30.1"
+description = "Scan the repository for secrets"
+run = "gitleaks dir ."
+
+[tasks.commits]
+tools.cocogitto = "7.0.0"
+description = "Enforce conventional commits"
+run = "cog check"
+
+[tasks."release:version"]
+tools.cocogitto = "7.0.0"
+description = "Create the next version and tag"
+run = "cog bump --auto"
+
+[tasks.check]
+description = "Run project checks"
+depends = ["secrets", "commits"]
