@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.2](https://github.com/lauritsk/devcontainer/compare/2050033a8c64fce86d4e5b477137b84554ba73f9..v0.1.2) - 2026-04-10
+#### Bug Fixes
+- (**mise**) add missing tools to mise lockfile - ([2050033](https://github.com/lauritsk/devcontainer/commit/2050033a8c64fce86d4e5b477137b84554ba73f9)) - Karl Hans Laurits
+
+- - -
+
 ## [v0.1.1](https://github.com/lauritsk/devcontainer/compare/22f88863bc8c5bd087481e504c91477a152a1d8f..v0.1.1) - 2026-04-10
 #### Bug Fixes
 - (**ci**) fix release auth and sign published images - ([22f8886](https://github.com/lauritsk/devcontainer/commit/22f88863bc8c5bd087481e504c91477a152a1d8f)) - Karl Hans Laurits
