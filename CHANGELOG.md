@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.1.3](https://github.com/lauritsk/devcontainer/compare/68a03274cefb2aa8023231d07a9d45455254e51a..v0.1.3) - 2026-04-10
+#### Bug Fixes
+- (**devcontainer**) add git and repair renovate tracking - ([dcda5a8](https://github.com/lauritsk/devcontainer/commit/dcda5a83dbfde2610e64ddff25c1b2470459ada0)) - Karl Hans Laurits
+#### Documentation
+- (**readme**) add release verification instructions - ([68a0327](https://github.com/lauritsk/devcontainer/commit/68a03274cefb2aa8023231d07a9d45455254e51a)) - Karl Hans Laurits
+#### Miscellaneous Chores
+- (**deps**) update docker/setup-qemu-action action to v4 - ([07ebc71](https://github.com/lauritsk/devcontainer/commit/07ebc71cce71e35b648d6a799b869cbd82fdcb89)) - renovate[bot]
+- (**deps**) update docker/setup-buildx-action action to v4 - ([2b12e3d](https://github.com/lauritsk/devcontainer/commit/2b12e3da96456cf7865b0e7576f9c7ae17ff724b)) - renovate[bot]
+- (**deps**) update docker/login-action action to v4 - ([200d2e3](https://github.com/lauritsk/devcontainer/commit/200d2e3511c2ecf1949e9c0a5a26a3df9652de91)) - renovate[bot]
+
+- - -
+
 ## [v0.1.2](https://github.com/lauritsk/devcontainer/compare/2050033a8c64fce86d4e5b477137b84554ba73f9..v0.1.2) - 2026-04-10
 #### Bug Fixes
 - (**mise**) add missing tools to mise lockfile - ([2050033](https://github.com/lauritsk/devcontainer/commit/2050033a8c64fce86d4e5b477137b84554ba73f9)) - Karl Hans Laurits
