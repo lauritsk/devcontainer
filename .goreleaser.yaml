@@ -26,6 +26,17 @@ dockers_v2:
     platforms:
       - linux/amd64
       - linux/arm64
+    sbom: true
+
+docker_signs:
+  - ids:
+      - devcontainer
+    artifacts: all
+    cmd: cosign
+    args:
+      - sign
+      - "${artifact}@${digest}"
+      - --yes
 
 changelog:
   sort: asc
