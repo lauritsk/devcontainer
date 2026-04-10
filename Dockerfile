@@ -4,11 +4,13 @@ COPY etc/ /etc/
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+        curl=8.14.1-2+deb13u2 \
         passwd=1:4.17.4-2 \
         sudo=1.9.16p2-3+deb13u1 \
         fish=4.6.0-1 \
         git=1:2.47.3-0+deb13u1 \
         mise=2026.4.8 \
+        openssh-client=1:10.0p1-7+deb13u2 \
         tailscale=1.96.4 \
     && pam-auth-update --force --package \
     && groupadd --gid 1000 dev \
