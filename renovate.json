@@ -11,10 +11,25 @@
         "/(^|/)Dockerfile$/"
       ],
       "matchStrings": [
-        "(?:^|\\n)\\s*(?<depName>passwd|sudo|fish|mise|tailscale)=(?<currentValue>[^\\s\\\\]+)"
+        "(?:^|\\n)\\s*(?<depName>passwd|sudo|git|mise|tailscale)=(?<currentValue>[^\\s\\\\]+)"
       ],
       "datasourceTemplate": "deb",
       "versioningTemplate": "deb"
+    },
+    {
+      "customType": "regex",
+      "description": "Update fish package version in Dockerfile",
+      "managerFilePatterns": [
+        "/(^|/)Dockerfile$/"
+      ],
+      "matchStrings": [
+        "fish=(?<currentValue>[^\\s\\\\]+)"
+      ],
+      "depNameTemplate": "fish-shell/fish-shell",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^(?<version>.+)-\\d+$",
+      "autoReplaceStringTemplate": "fish={{{newValue}}}-1"
     }
   ],
   "automerge": true,
@@ -30,21 +45,11 @@
       ],
       "matchPackageNames": [
         "passwd",
-        "sudo"
+        "sudo",
+        "git"
       ],
       "registryUrls": [
         "https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64"
-      ]
-    },
-    {
-      "matchDatasources": [
-        "deb"
-      ],
-      "matchPackageNames": [
-        "fish"
-      ],
-      "registryUrls": [
-        "https://download.opensuse.org/repositories/shells:/fish:/release:/4/Debian_13?suite=/&components=&binaryArch=arm64"
       ]
     },
     {
