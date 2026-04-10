@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.2.0](https://github.com/lauritsk/devcontainer/compare/d8c959a5b286241fd8776574dcd011041eedee1a..v0.2.0) - 2026-04-10
+#### Features
+- (**devcontainer**) add curl and ssh-agent tools - ([d8c959a](https://github.com/lauritsk/devcontainer/commit/d8c959a5b286241fd8776574dcd011041eedee1a)) - Karl Hans Laurits
+
+- - -
+
 ## [v0.1.3](https://github.com/lauritsk/devcontainer/compare/68a03274cefb2aa8023231d07a9d45455254e51a..v0.1.3) - 2026-04-10
 #### Bug Fixes
 - (**devcontainer**) add git and repair renovate tracking - ([dcda5a8](https://github.com/lauritsk/devcontainer/commit/dcda5a83dbfde2610e64ddff25c1b2470459ada0)) - Karl Hans Laurits
