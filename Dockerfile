@@ -9,7 +9,7 @@ RUN apt-get update \
         sudo=1.9.16p2-3+deb13u1 \
         fish=4.6.0-1 \
         git=1:2.47.3-0+deb13u1 \
-        mise=2026.4.8 \
+        mise=2026.4.11 \
         openssh-client=1:10.0p1-7+deb13u2 \
         tailscale=1.96.4 \
     && pam-auth-update --force --package \
