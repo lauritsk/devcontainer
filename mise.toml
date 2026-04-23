@@ -1,39 +1,41 @@
 [tools]
-actionlint = "1.7.12"
+"aqua:gastownhall/beads" = "1.0.2"
 cocogitto = "7.0.0"
-cosign = "3.0.6"
-gitleaks = "8.30.1"
-goreleaser = "2.15.2"
-hadolint = "2.14.0"
+trivy = "0.70.0"
 shellcheck = "0.11.0"
-syft = "1.42.4"
-trivy = "0.69.3"
-
-[hooks]
-enter = { task = "setup" }
+actionlint = "1.7.12"
+cosign = "3.0.6"
+syft = "1.43.0"
+goreleaser = "2.15.4"
+hadolint = "2.14.0"
 
 [tasks.setup]
-description = "Prime the base image when Docker is available"
-run = "docker info >/dev/null 2>&1 && (docker image inspect dhi.io/debian-base:trixie-debian13-dev@sha256:9415967aa0ed8adea8b5c048994259d1982026dca143d0303c7bbe0e11ed67d3 >/dev/null 2>&1 || docker pull dhi.io/debian-base:trixie-debian13-dev@sha256:9415967aa0ed8adea8b5c048994259d1982026dca143d0303c7bbe0e11ed67d3) || true"
+description = "Prepare local project environment"
+depends = ["setup:pre-commit"]
 
-[tasks.commit]
-# tools.cocogitto = "7.0.0"
-description = "Create a conventional commit"
-run = "cog commit"
+[tasks."setup:pre-commit"]
+description = "Install git pre-commit hook"
+run = "mise generate git-pre-commit --write --task=pre-commit"
+
+[tasks."pre-commit"]
+description = "Run pre-commit checks"
+depends = ["lint"]
 
 [tasks."lint:docker"]
-# tools.hadolint = "2.14.0"
 description = "Lint the Dockerfile"
 run = "hadolint Dockerfile"
 
 [tasks."lint:actions"]
-# tools.actionlint = "1.7.12"
 description = "Lint GitHub Actions workflows"
 run = "actionlint"
 
+[tasks."lint:shell"]
+description = "Lint shell scripts"
+run = "files=$(find . -type f -name '*.sh' -not -path './.git/*' -not -path './node_modules/*' -not -path './vendor/*'); if [ -n \"$files\" ]; then printf '%s\\n' \"$files\" | while IFS= read -r file; do shellcheck \"$file\"; done; else echo 'skip: no shell scripts found'; fi"
+
 [tasks.lint]
 description = "Run all lint checks"
-depends = ["lint:docker", "lint:actions"]
+depends = ["lint:docker", "lint:actions", "lint:shell"]
 
 [tasks.build]
 description = "Build devcontainer image"
@@ -44,40 +46,40 @@ description = "Run container smoke tests"
 depends = ["build"]
 run = "docker run --rm localhost/devcontainer:latest fish -lc 'test \"$(id -un)\" = dev && test \"$HOME\" = /home/dev && command -v fish >/dev/null && command -v mise >/dev/null && command -v sudo >/dev/null && command -v tailscale >/dev/null'"
 
-[tasks.audit]
-# tools.trivy = "0.69.3"
-description = "Audit the built image for vulnerabilities"
+[tasks."audit:image"]
+description = "Audit the built image for OS package vulnerabilities"
 depends = ["build"]
-run = "trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 localhost/devcontainer:latest"
+run = "trivy image --pkg-types os --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 localhost/devcontainer:latest"
 
-[tasks.secrets]
-# tools.gitleaks = "8.30.1"
-description = "Scan the repository for secrets"
-run = "gitleaks dir ."
+[tasks."audit:trivy"]
+description = "Audit repository files with Trivy, including secrets"
+run = "trivy fs --scanners vuln,misconfig,secret --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 ."
 
-[tasks.commits]
-# tools.cocogitto = "7.0.0"
-description = "Enforce conventional commits"
-run = "cog check"
+[tasks.audit]
+description = "Run all audit checks"
+depends = ["audit:image", "audit:trivy"]
+
+[tasks.sbom]
+description = "Generate an SBOM for the repository"
+run = "output=${SBOM_OUTPUT:-sbom.syft.json}; syft dir:. -o syft-json=\"$output\" && printf 'wrote %s\\n' \"$output\""
+
+[tasks."check:commits"]
+description = "Check conventional commits for new commits"
+run = "head=$(git rev-parse HEAD); base=$(git merge-base HEAD origin/main 2>/dev/null || true); if [ -n \"$base\" ] && [ \"$base\" != \"$head\" ]; then cog check \"$base..$head\"; elif git rev-parse --verify HEAD~1 >/dev/null 2>&1; then cog check HEAD~1..HEAD; else echo 'skip: no commit range available'; fi"
 
 [tasks."release:version"]
-# tools.cocogitto = "7.0.0"
 description = "Create the next version and tag"
 run = "cog bump --auto"
 
 [tasks."release:check"]
-# tools.goreleaser = "2.15.2"
 description = "Validate GoReleaser configuration"
 run = "goreleaser check"
 
 [tasks."release:verify"]
-# tools.goreleaser = "2.15.2"
 description = "Verify release pipeline from a clean worktree"
 run = "tmp=$(mktemp -d) && trap 'git worktree remove --force \"$tmp\"' EXIT && git worktree add --quiet --detach \"$tmp\" HEAD && (cd \"$tmp\" && goreleaser release --snapshot --clean)"
 
 [tasks."release:publish"]
-# tools.goreleaser = "2.15.2"
-# tools.cosign = "3.0.6"
 description = "Publish the current tagged release"
 depends = ["check", "release:verify"]
 run = "goreleaser release --clean"
@@ -88,4 +90,4 @@ depends = ["release:publish"]
 
 [tasks.check]
 description = "Run project checks"
-depends = ["setup", "lint", "test", "audit", "secrets", "commits", "release:check"]
+depends = ["lint", "test", "audit", "check:commits", "release:check"]
