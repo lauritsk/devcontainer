@@ -1,40 +1,35 @@
+[env]
+HK_MISE = 1
+
 [tools]
-cocogitto = "7.0.0"
-trivy = "0.70.0"
-shellcheck = "0.11.0"
 actionlint = "1.7.12"
+cocogitto = "7.0.0"
 cosign = "3.0.6"
-syft = "1.44.0"
 goreleaser = "2.15.4"
 hadolint = "2.14.0"
+hk = "1.44.3"
+pkl = "0.31.1"
+rumdl = "0.1.87"
+shellcheck = "0.11.0"
+shfmt = "3.13.1"
+syft = "1.44.0"
+tombi = "0.10.2"
+trivy = "0.70.0"
 
-[tasks.setup]
+[hooks]
+postinstall = "hk install --mise"
+
+[tasks.install]
 description = "Prepare local project environment"
-depends = ["setup:pre-commit"]
+run = "true"
 
-[tasks."setup:pre-commit"]
-description = "Install git pre-commit hook"
-run = "mise generate git-pre-commit --write --task=pre-commit"
-
-[tasks."pre-commit"]
-description = "Run pre-commit checks"
-depends = ["lint"]
-
-[tasks."lint:docker"]
-description = "Lint the Dockerfile"
-run = "hadolint Dockerfile"
-
-[tasks."lint:actions"]
-description = "Lint GitHub Actions workflows"
-run = "actionlint"
-
-[tasks."lint:shell"]
-description = "Lint shell scripts"
-run = "find . -type f -name '*.sh' -exec shellcheck {} +"
+[tasks.fix]
+description = "Run hk-managed fixers across the repository"
+run = "hk fix --all"
 
 [tasks.lint]
-description = "Run all lint checks"
-depends = ["lint:docker", "lint:actions", "lint:shell"]
+description = "Run hk-managed checks across the repository"
+run = "hk check --all"
 
 [tasks.build]
 description = "Build devcontainer image"
@@ -45,49 +40,19 @@ description = "Run container smoke tests"
 depends = ["build"]
 run = "docker run --rm localhost/devcontainer:latest fish -lc 'test \"$(id -un)\" = dev && test \"$HOME\" = /home/dev && command -v fish >/dev/null && command -v mise >/dev/null && command -v sudo >/dev/null && command -v tailscale >/dev/null'"
 
-[tasks."audit:image"]
-description = "Audit the built image for OS package vulnerabilities"
-depends = ["build"]
-run = "trivy image --pkg-types os --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 localhost/devcontainer:latest"
-
-[tasks."audit:trivy"]
-description = "Audit repository files with Trivy, including secrets"
-run = "trivy fs --scanners vuln,misconfig,secret --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 ."
-
 [tasks.audit]
-description = "Run all audit checks"
-depends = ["audit:image", "audit:trivy"]
-
-[tasks.sbom]
-description = "Generate an SBOM for the repository"
-run = "syft dir:. -o syft-json=\"${SBOM_OUTPUT:-sbom.syft.json}\""
-# run = 'syft dir:. --source-name "${SBOM_SOURCE_NAME:-devcontainer}" --source-version "${SBOM_SOURCE_VERSION:-dev}" -o syft-json="${SBOM_OUTPUT:-sbom.syft.json}"'
-
-[tasks."check:commits"]
-description = "Check conventional commits for new commits"
-run = "cog check"
-
-[tasks."release:version"]
-description = "Create the next version and tag"
-run = "cog bump --auto"
-
-[tasks."release:check"]
-description = "Validate GoReleaser configuration"
-run = "goreleaser check"
-
-[tasks."release:verify"]
-description = "Verify release pipeline from a clean worktree"
-run = "goreleaser release --snapshot --clean"
-
-[tasks."release:publish"]
-description = "Publish the current tagged release"
-depends = ["check", "release:verify"]
-run = "goreleaser release --clean"
-
-[tasks.release]
-description = "Publish the current tagged release"
-depends = ["release:publish"]
+description = "Audit built image and repository files"
+depends = ["build"]
+run = "trivy image --pkg-types os --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 localhost/devcontainer:latest && trivy fs --scanners vuln,misconfig,secret --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 ."
 
 [tasks.check]
 description = "Run project checks"
-depends = ["lint", "test", "audit", "check:commits", "release:check"]
+depends = ["lint", "test", "audit"]
+
+[tasks."release:bump"]
+description = "Bump project version"
+run = "cog bump --auto"
+
+[tasks."release:publish"]
+description = "Publish release"
+run = "goreleaser release --clean"
