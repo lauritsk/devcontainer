@@ -12,6 +12,12 @@ It ships with a sensible interactive shell setup and a small toolset for contain
 
 Published images are built for `linux/amd64` and `linux/arm64`, signed with keyless Cosign, and include an SBOM.
 
+## Status
+
+- Maturity: maintained support image
+- Primary command: `mise run check`
+- Release target: container image / GitHub release
+
 ## Why this image?
 
 This repository is the source for the published image at `ghcr.io/lauritsk/devcontainer`.
